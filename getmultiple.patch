@@ -1,0 +1,12 @@
+diff --git a/linotpd/src/linotp/tests/functional/test_getotp.py b/linotpd/src/linotp/tests/functional/test_getotp.py
+index 19a6110d..bf4e912d 100644
+--- a/linotpd/src/linotp/tests/functional/test_getotp.py
++++ b/linotpd/src/linotp/tests/functional/test_getotp.py
+@@ -335,6 +335,7 @@ class TestGetOtpController(TestController):
+         otps = resp.get('result').get('value').get('otp')
+ 
+         otp1 = otps.get('44576668')
++        self.assertTrue(otp1, response)
+         self.assertTrue(otp1.get('otpval') == '75301418', response)
+         self.assertTrue(otp1.get('time') == "2012-05-18 02:14:00", response)
+ 
