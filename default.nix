@@ -6,4 +6,5 @@ let
 in
 {
   linotp = pkgs.callPackage ./pkg.nix { python27Packages = python27.pkgs; };
+  inherit python27; # required for the module
 }

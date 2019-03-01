@@ -1,7 +1,7 @@
-{ pkgs, fetchFromGitHub }:
+{ pkgs, fetchFromGitHub, lib }:
 self: super:
 let
-  inherit (super) buildPythonPackage fetchPypi lib;
+  inherit (super) buildPythonPackage fetchPypi;
 in {
   # sqlalchemy = (super.sqlalchemy.overrideAttrs (old: {
   #     src = fetchPypi {
@@ -20,7 +20,7 @@ in {
     };
     propagatedBuildInputs = with self; [ PasteScript WebError Mako ] ++ (with super; [ markupsafe tempita beaker routes FormEncode decorator simplejson webhelpers ]);
     checkInputs = with super; [ genshi jinja2 ];
-    meta.license = with lib.licenses; [ bsd ];
+    meta.license = with lib.licenses; [ bsd3 ];
   };
   PasteScript = buildPythonPackage rec {
     pname = "PasteScript";

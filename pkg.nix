@@ -58,6 +58,6 @@ in python27Packages.buildPythonApplication {
 
   meta = with lib; {
     homepage = "https://linotp.org";
-    license = with lib.licenses; [ agpl ];
+    license = with lib.licenses; [ agpl3 ];
   };
 }
