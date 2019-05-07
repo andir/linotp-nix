@@ -15,11 +15,13 @@ LOG = logging.getLogger(__name__)
 parser = argparse.ArgumentParser()
 parser.add_argument('--linotp', help="Linotp base url e.g. https://linotp", default='https://linotp')
 parser.add_argument('--debug', help='enable debug log level', action='store_true', default=False)
+parser.add_argument('--username', help='name of the user that will be created', default='user')
 
 def main():
     args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if args.debug else logging.INFO)
 
+    username = args.username
 
     LOG.info("Using LinOTP base url: %s", args.linotp)
     #LOG.info("Using puppet phone base url: %s", args.puppet_phone)
@@ -36,7 +38,7 @@ def main():
     # import users from CSV
 
     LOG.info("Importing users")
-    csv_file = io.StringIO("user,20,,test user,,,,password")
+    csv_file = io.StringIO("{},20,,test user,,,,password".format(username))
 
     req = session.post('{}/tools/import_users'.format(args.linotp),
             data=dict(
@@ -67,9 +69,9 @@ def main():
     # set policies
     LOG.info("Setting policies")
     policies = [
-    #    dict(name='challenge_response', user='*', realm='*', client='*', active=True, scope='authentication', action='challenge_response=*'),
-    #    dict(name='default_provider', user='*', realm='*', client='*', active=True, scope='authentication', action='push_provider=default_push, '),
-    #    dict(name='selfservice', user='*', realm='*', client='*', active=True, scope='selfservice', action='enrollPUSH, activate_PushToken'),
+        dict(name='challenge_response', user='*', realm='*', client='*', active=True, scope='authentication', action='challenge_response=PW TOTP'),
+        dict(name='otppin_policy', user='*', realm='*', client='*', active=True, scope='authentication', action='otppin=password'),
+        dict(name='selfservice', user='*', realm='*', client='*', active=True, scope='selfservice', action='enrollPW, enrollHOTP, enrollTOTP, enrollHTMAC, enrollPUSH, activate_PushToken'),
     ]
 
     for policy in policies:
@@ -84,7 +86,7 @@ def main():
     user_session = requests.Session()
     user_session.verify = False
 
-    req = user_session.post('{}/userservice/login'.format(args.linotp), data=dict(login='user', password='password'))
+    req = user_session.post('{}/userservice/login'.format(args.linotp), data=dict(login=username, password='password'))
     LOG.info('User login result: %s', req.text)
     LOG.info('User login request body: %s', req.request.body)
     user_session_cookie = list(user_session.cookies.values())[-1]
@@ -100,7 +102,8 @@ def main():
               otppin=PIN,
               type='pw',
               otpkey=PIN,
-              user="user",
+              user=username,
+              realm='lino',
               session=session_param,
         )
     )

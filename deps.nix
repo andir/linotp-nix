@@ -18,7 +18,11 @@ in {
       inherit pname version;
       sha256 = "1a0dywpq943bdxpkjvszsr9gxzbcj2sy7mcx960adgpirq0i8aa9";
     };
-    propagatedBuildInputs = with self; [ PasteScript WebError Mako ] ++ (with super; [ markupsafe tempita beaker routes FormEncode decorator simplejson webhelpers ]);
+    propagatedBuildInputs = with self; [ PasteScript WebError Mako  ] ++ (with super; [ tempita markupsafe beaker routes FormEncode decorator simplejson webhelpers ]);
+    postPatch = ''
+      sed -e 's/"Tempita>=0.5.1",//' -i setup.py
+    '';
+    checkPhase = "true";
     checkInputs = with super; [ genshi jinja2 ];
     meta.license = with lib.licenses; [ bsd3 ];
   };
@@ -90,6 +94,16 @@ in {
     buildInputs = with pkgs; [ libsodium ];
     postPatch = ''
       sed -e 's,sodium = ctypes.cdll.LoadLibrary(.*$,sodium = ctypes.cdll.LoadLibrary("${pkgs.libsodium}/lib/libsodium.so"),' -i pysodium/__init__.py
+      sed -e 's,\[pytest\],[tool:pytest],g' -i setup.py
     '';
+  };
+  tempita = buildPythonPackage rec {
+    pname = "Tempita";
+    version = "0.5.2";
+    src = fetchPypi {
+      inherit pname version;
+      sha256 = "177wwq45slfyajd8csy477bmdmzipyw0dm7i85k3akb7m85wzkna";
+    };
+    checkInputs = with super; [ nose ];
   };
 }
